@@ -8,7 +8,7 @@ class State(rx.State):
 
     # Variables
     raffle_file: list[str]
-    participants_number: str = "0"
+    participants_number: int = 0
     winner_number: str = "?"
     winner_name: str = "?"
     data = pd.DataFrame()
@@ -49,22 +49,22 @@ class State(rx.State):
             # Actualiza las variables
             self.raffle_file.append(file.filename)
             self.data = pd.read_csv(outfile, sep=";", encoding="ISO-8859-1")
-            self.participants_number = str(self.data.shape[0])
+            self.participants_number = self.data.shape[0]
 
     def handle_reset(self):
         """Handle the reset of the app."""
         self.raffle_file = []
-        self.participants_number = "?"
+        self.participants_number = 0
         self.winner_number = "?"
         self.winner_name = "?"
 
-    def raffle(self, numero: str):
+    def raffle(self, participants_number: int):
         """
-        Función que genera un nÃ®mero aleatorio entre 0 y el numero de participantes
+        Función que genera un numero aleatorio entre 0 y el numero de participantes
         """
-        number = secrets.randbelow(10000)
-        self.winner_number = str(self.data["id"][number % int(numero)])
-        self.winner_name = str(self.data["Nombre"][number % int(numero)])
+        random_number = secrets.randbelow(10000)
+        self.winner_number = str(self.data["id"][random_number % participants_number])
+        self.winner_name = str(self.data["Nombre"][random_number % participants_number])
 
 
 COLOR = "rgb(107,99,246)"
@@ -80,7 +80,7 @@ def index() -> rx.Component:
             rx.box(
                 "Sube un archivo ",
                 rx.code(".csv", font_size="1em"),
-                " y haz tu sorteo! [id] [Nombre]",
+                " y haz tu sorteo! [id];[Nombre]",
             ),
             # Box para subir los archivos
             rx.upload(
